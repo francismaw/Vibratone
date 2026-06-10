@@ -1,1 +1,1 @@
-# VIbraphone
+# Vibraphone
