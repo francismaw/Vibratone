@@ -9,7 +9,7 @@ pub struct NoteEvent {
 pub fn pitch_to_freq(pitch: u8) -> f32 { 
 
 
-   let mut freq = 440.0 * 2.0_f32.powf((pitch - 69) as f32/ 12.0);
+   let freq = 440.0 * 2.0_f32.powf((pitch as f32 - 69.0) as f32/ 12.0);
 
    freq
 }
