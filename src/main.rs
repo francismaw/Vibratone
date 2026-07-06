@@ -10,9 +10,14 @@ fn main(){
     let note = note::pitch_to_freq(69);
     println!("Frequency of A4 (pitch 69) is: {} Hz", note);
 
-    let samples = synth::pluck(220.0, SAMPLE_RATE as usize * 2);
+    //let samples = synth::pluck(220.0, SAMPLE_RATE as usize * 2);
 
     //println!("Samples at 220 Hz: {:?}", samples);
+    // E2; 82.407, A2:  110.0, D3: 146.83, G3: 196.00, B3: 246.94, E4: 329.63
+
+
+
+    
 
 
 
@@ -22,9 +27,34 @@ fn main(){
     io::stdin()
         .read_line(& mut input)
         .expect("Failed to read line");
-    write_wav(&input.trim(), &samples).expect("Failed to write");
+    //write_wav(&input.trim(), &samples).expect("Failed to write");
+    note_test(&input.trim());
 
 }
+
+fn note_test(path: &str){
+    let notes = vec![NoteEvent{pitch: 60, onset_samples: 0, duration_samples: SAMPLE_RATE as usize * 2},
+    NoteEvent{pitch: 64, onset_samples: SAMPLE_RATE as usize *2, duration_samples: SAMPLE_RATE as usize * 2},
+    NoteEvent{pitch: 67, onset_samples: SAMPLE_RATE as usize *4, duration_samples: SAMPLE_RATE as usize * 2}];
+
+    let rendered = synth::render(&notes);
+    write_wav(path, &rendered).expect("Failed to write");
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 fn write_wav(path: &str, samples: &[f32]) -> Result<(), hound::Error>{
     let spec = WavSpec{

@@ -1,6 +1,6 @@
 
 
-use crate::note::NoteEvent;
+use crate::note::{self, NoteEvent, pitch_to_freq};
 use rand::rng;
 use crate::note::SAMPLE_RATE;
 
@@ -24,11 +24,40 @@ pub fn pluck(freq: f32, num_samples: usize) -> Vec<f32> {
         }
     }
 
-    println!("y[0] = {}, y[N] = {}, y[0]*0.5 = {}", y[0], y[N], y[0] * 0.5);
+    //println!("y[0] = {}, y[N] = {}, y[0]*0.5 = {}", y[0], y[N], y[0] * 0.5);
     y
 
 
 }
 
 /// Sum each note's pluck into one buffer at its onset, then normalize to [-1, 1].
-pub fn render(notes: &[NoteEvent]) -> Vec<f32> { todo!() }
+pub fn render(notes: &[NoteEvent]) -> Vec<f32> { 
+
+    let master_buffer_length = notes.iter().map(|n| n.onset_samples + n.duration_samples).max().unwrap_or(0);
+
+    let mut master_buffer = vec![0.0; master_buffer_length];
+
+    notes.iter().for_each(|n| {
+        let freq = pitch_to_freq(n.pitch);
+        let plucked = pluck(freq, n.duration_samples);
+        for i in 0..n.duration_samples{
+            master_buffer[n.onset_samples + i] += plucked[i];
+        }
+    });
+    let mut max = 0.0;
+    for &item in master_buffer.iter() {
+        if item.abs() > max {
+            max = item.abs();
+        }
+    }
+
+    if max > 1.0 {
+        for i in 0..master_buffer.len(){
+            master_buffer[i] = master_buffer[i] / max;
+        }
+    }
+
+
+
+    master_buffer
+}
