@@ -28,7 +28,8 @@ fn main(){
         .read_line(& mut input)
         .expect("Failed to read line");
     //write_wav(&input.trim(), &samples).expect("Failed to write");
-    note_test(&input.trim());
+    //note_test(&input.trim());
+    tab_test(&input.trim());
 
 }
 
@@ -39,7 +40,14 @@ fn note_test(path: &str){
 
     let rendered = synth::render(&notes);
     write_wav(path, &rendered).expect("Failed to write");
-    }
+}
+
+fn tab_test(path: &str){
+    let tab = "e|-1-----1-----1-----1-----|";
+    let notes = tab::parser(tab);
+    let rendered  = synth::render(&notes);
+    write_wav(path, &rendered).expect("Failed to write");
+}
 
 
 
