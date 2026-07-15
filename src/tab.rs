@@ -11,15 +11,22 @@ const SAMPLES_PER_COLUMN: usize = SAMPLE_RATE as usize / 4;
 
 
 pub fn parser(tab: &str) -> Vec<NoteEvent>{
-    let lines: Vec<&str> = tab.lines().collect();
+    let lines: Vec<&str> = tab.lines().filter(|l| !l.trim().is_empty()).collect();
     let stripped_lines = strip_prefixes(&lines);
-    let notes = parse_block(&stripped_lines);
+    let chunks = stripped_lines.chunks(6);
+    let mut notes = Vec::new();
+    let mut col_offset = 0;
+    for chunk in chunks {
+        let chunk_notes = parse_block(chunk, col_offset);
+        notes.extend(chunk_notes);
+        col_offset += chunk[0].len();
+    }
     return notes;
 }
 
-fn parse_block(lines: &[&str]) -> Vec<NoteEvent>{
+fn parse_block(lines: &[&str], col_offset: usize) -> Vec<NoteEvent>{
     let mut notes = Vec::new();
-    for string in 0..6{
+    for string in 0..lines.len(){
         let mut col = 0;
         while col < lines[0].len(){
             let bytes = lines[string].as_bytes();
@@ -27,7 +34,7 @@ fn parse_block(lines: &[&str]) -> Vec<NoteEvent>{
             //let c_next = bytes.get(col + 1);
             if c.is_ascii_digit() {
                 let pitch = OPEN_STRINGS[string] + (c - b'0');
-                let onset_samples = col * SAMPLES_PER_COLUMN;
+                let onset_samples = (col + col_offset) * SAMPLES_PER_COLUMN;
                 let  duration_samples = (SAMPLE_RATE * 2) as usize;
                 notes.push(NoteEvent{pitch, onset_samples, duration_samples});
             }
