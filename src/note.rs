@@ -1,5 +1,5 @@
 pub const SAMPLE_RATE: u32 = 44_100;
-
+#[derive(Debug)]
 pub struct NoteEvent {
     pub pitch: u8,            
     pub onset_samples: usize,
