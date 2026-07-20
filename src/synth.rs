@@ -3,6 +3,7 @@
 use crate::note::{self, NoteEvent, pitch_to_freq};
 use rand::rng;
 use crate::note::SAMPLE_RATE;
+use crate::effects::apply_vibratone;
 
 
 /// One plucked string: returns `num_samples` of audio at the given frequency.
@@ -57,7 +58,9 @@ pub fn render(notes: &[NoteEvent]) -> Vec<f32> {
         }
     }
 
+    let vibratone_buffer = apply_vibratone(&master_buffer, 6.0);
 
 
-    master_buffer
+
+    vibratone_buffer
 }

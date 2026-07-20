@@ -1,6 +1,7 @@
 mod tab;
 mod synth;
 mod note;
+mod effects;
 use std::io::{self, Read};
 use crate::note::{NoteEvent, SAMPLE_RATE};
 
