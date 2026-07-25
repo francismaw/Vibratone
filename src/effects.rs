@@ -1,9 +1,13 @@
+use rand::seq::index::sample;
+
 use crate::note::SAMPLE_RATE;
 
 
 
 pub fn apply_vibratone(samples: &[f32], rate_hz: f32)-> Vec<f32>{
-    return tremolo(samples, rate_hz);
+    //return tremolo(samples, rate_hz);
+
+    return dopplar(samples, rate_hz)
 
 }
 
@@ -19,5 +23,38 @@ fn tremolo(samples: &[f32], rate_hz: f32) -> Vec<f32>{
 }
 
 fn dopplar(samples: &[f32], rate_hz: f32) -> Vec<f32>{
-    todo!()
+    let mut output: Vec<f32> = Vec::with_capacity(samples.len());
+    let mut n = 0;
+    let mut read_pos = 0.0;
+    let v = 343.0;
+    let v_s = 0.254 as f32 * rate_hz * std::f32::consts::PI;
+
+
+    while read_pos < (samples.len() - 1) as f32{
+        let t = n as f32 / SAMPLE_RATE as f32;
+        let theta = 2.0 * std::f32::consts::PI * rate_hz * t;
+        let step = v / (v - v_s * theta.cos() );
+        output.push(sample_at(samples, read_pos));
+        read_pos += step;
+        n += 1;
+
+
+    }
+
+    output
+
+
+
+    
 }
+
+fn sample_at(input: &[f32], read_pos: f32) -> f32{
+    let i = read_pos.floor() as usize;
+    let frac = read_pos - i as f32;
+    let out = input[i] * (1 as f32 - frac) + input[i + 1] * frac;
+
+
+    out
+    
+}
+
