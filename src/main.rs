@@ -40,7 +40,7 @@ fn note_test(path: &str){
     NoteEvent{pitch: 67, onset_samples: SAMPLE_RATE as usize *4, duration_samples: SAMPLE_RATE as usize * 2}];
 
     let rendered = synth::render(&notes);
-    write_wav(path, &rendered).expect("Failed to write");
+    //write_wav(path, &rendered).expect("Failed to write");
 }
 
 fn tab_test(path: &str){
@@ -62,8 +62,10 @@ fn tab_test(path: &str){
 
     let notes = tab::parser(tab);
     println!("Notes: {:?}", notes);
-    let rendered  = synth::render(&notes);
-    write_wav(path, &rendered).expect("Failed to write");
+    let mono  = synth::render(&notes);
+    let rate = 6.0;
+    let (left, right) = effects::apply_vibratone(&mono, rate);
+    write_wav(path, &left, &right).expect("Failed to write");
 }
 
 
@@ -74,30 +76,22 @@ fn tab_test(path: &str){
 
 
 
-
-
-
-
-
-
-
-fn write_wav(path: &str, samples: &[f32]) -> Result<(), hound::Error>{
+fn write_wav(path: &str, left: &[f32], right: &[f32]) -> Result<(), hound::Error>{
     let spec = WavSpec{
-        channels: 1,
+        channels: 2,
         sample_rate: SAMPLE_RATE,
         bits_per_sample: 32,
         sample_format: SampleFormat::Float,
     };
 
     let mut writer = WavWriter::create(path, spec)?;
-    let extra_samples = SAMPLE_RATE * 2;
+
+    let frames = left.len().min(right.len());
     
-    for data in samples{
-        let scaled_data = *data;
-        writer.write_sample(scaled_data)?;
-    }
-    for _ in 0..extra_samples {
-        writer.write_sample(0.0f32).unwrap();
+    for i in 0..frames{
+        writer.write_sample(left[i])?;
+        writer.write_sample(right[i])?;
+
     }
 
     writer.finalize()

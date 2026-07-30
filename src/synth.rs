@@ -58,9 +58,7 @@ pub fn render(notes: &[NoteEvent]) -> Vec<f32> {
         }
     }
 
-    let vibratone_buffer = apply_vibratone(&master_buffer, 6.0);
+    master_buffer
 
 
-
-    vibratone_buffer
 }
