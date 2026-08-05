@@ -63,9 +63,10 @@ fn tab_test(path: &str){
     let notes = tab::parser(tab);
     println!("Notes: {:?}", notes);
     let mono  = synth::render(&notes);
-    let rate = 6.0;
+    let rate = 5.67; // rate of drum spinning rpm / 60 
     let (left, right) = effects::apply_vibratone(&mono, rate);
     write_wav(path, &left, &right).expect("Failed to write");
+    //write_wav(path, &left, &right).expect("Failed to write");
 }
 
 
