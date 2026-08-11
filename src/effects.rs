@@ -97,10 +97,9 @@ fn sample_at(input: &[f32], read_pos: f32) -> f32{
 
 fn lowpass(samples: &[f32], rate_hz: f32, phase: f32) -> Vec<f32>{
     let mut prev = 0.0;
-    let a_center = 5.0;
+    let a_center = 0.5;
     let a_depth = 0.3;
     let mut output: Vec<f32> = Vec::with_capacity(samples.len());
-
     for n in 0..samples.len(){
         let t = n as f32 / SAMPLE_RATE as f32;
         let theta = 2.0 * std::f32::consts::PI * rate_hz * (t + phase);
@@ -109,8 +108,6 @@ fn lowpass(samples: &[f32], rate_hz: f32, phase: f32) -> Vec<f32>{
         output.push(y);
         prev = y;
     }
-
-
     output
 
 }
