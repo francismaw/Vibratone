@@ -10,8 +10,8 @@ pub fn apply_vibratone(samples: &[f32], rate_hz: f32)-> (Vec<f32>, Vec<f32>){
 
     let pi = std::f32::consts::PI;
 
-    let mut left = delay_doppler(&tremolo(samples, rate_hz, 0.0), rate_hz, 0.0);
-    let mut right  = delay_doppler(&tremolo(samples, rate_hz, pi), rate_hz, pi);
+    let mut left = lowpass(&tremolo(&delay_doppler(samples, rate_hz, 0.0), rate_hz, 0.0), rate_hz, 0.0);
+    let mut right  = lowpass(&tremolo(&delay_doppler(samples, rate_hz, pi), rate_hz, pi), rate_hz, pi);
 
     let n = left.len().min(right.len());
     left.truncate(n);
@@ -92,5 +92,26 @@ fn sample_at(input: &[f32], read_pos: f32) -> f32{
     let out = input[i] * (1 as f32 - frac) + input[i + 1] * frac;
     out
     
+}
+
+
+fn lowpass(samples: &[f32], rate_hz: f32, phase: f32) -> Vec<f32>{
+    let mut prev = 0.0;
+    let a_center = 5.0;
+    let a_depth = 0.3;
+    let mut output: Vec<f32> = Vec::with_capacity(samples.len());
+
+    for n in 0..samples.len(){
+        let t = n as f32 / SAMPLE_RATE as f32;
+        let theta = 2.0 * std::f32::consts::PI * rate_hz * (t + phase);
+        let alpha = a_center + a_depth * theta.cos();
+        let y = prev + alpha * (samples[n] - prev);
+        output.push(y);
+        prev = y;
+    }
+
+
+    output
+
 }
 
