@@ -9,24 +9,63 @@ use crate::effects::apply_vibratone;
 /// One plucked string: returns `num_samples` of audio at the given frequency.
 pub fn pluck(freq: f32, num_samples: usize) -> Vec<f32> { 
     let mut y = vec![0.0f32; num_samples];
+    let rho = 0.996;
+    //let N = (SAMPLE_RATE as f32 / freq - 0.5).round() as usize;
 
-    let N = (SAMPLE_RATE as f32 / freq - 0.5).round() as usize;
-    //let mut rng = rand::rng(); 
+    let exact_delay = SAMPLE_RATE as f32 / freq;
+    let mut N = exact_delay.floor() as usize;
+    let mut d = exact_delay - N as f32;
+
+    if d < 0.5 {
+        N -= 1;
+        d += 1.0;
+    }
+
+    let C = (1.0 - d) / (1.0 + d);
+    let mut prev_x = 0.0;
+    let mut prev_y = 0.0;
+
+
+
     for i in 0..N{
         let val = rand::random_range(-1.0 as f32..1.0 as f32);
         y[i] = val;
     }
-
-    for n in N..num_samples{
-        if n == N{
-            y[N] = y[0] * 0.5;
-        } else {
-          y[n] = (y[n - N] + y[n - N - 1 ]) * 0.5;
-        }
+    for i in 1..N {
+        y[i] = (y[i] + y[i-1]) * 0.5;
     }
 
+    
+
+    for n in N..num_samples{
+        let ks_val = if n == N{
+            y[0] * 0.5 * rho
+        } else {
+          (y[n - N] + y[n - N - 1 ]) * 0.5 * rho
+        };
+
+        let current_x = ks_val;
+        let apf_val = C * current_x + prev_x - C * prev_y;
+        prev_x = current_x;
+        prev_y = apf_val;
+        y[n] = apf_val;
+
+    }
+
+
+    let pickup_pos = 0.20;
+    let pickup_delay = (N as f32 * pickup_pos) as usize;
+
+    let mut pickup_out = vec![0.0f32; num_samples];
+    for i in 0..num_samples{
+        let curr_val = y[i];
+        let delayed_val = if i >= pickup_delay {y[i - pickup_delay]} else {0.0};
+        pickup_out[i] = curr_val - delayed_val;
+    }
+
+
     //println!("y[0] = {}, y[N] = {}, y[0]*0.5 = {}", y[0], y[N], y[0] * 0.5);
-    y
+    pickup_out
 
 
 }
