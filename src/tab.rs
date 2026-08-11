@@ -1,6 +1,7 @@
 use crate::note::{NoteEvent, SAMPLE_RATE};
-
-const OPEN_STRINGS: [u8; 6] = [64, 59, 55, 50, 45, 40]; 
+//standard tuning in MIDI note numbers: EADGBE
+//const OPEN_STRINGS: [u8; 6] = [64, 59, 55, 50, 45, 40]; 
+const OPEN_STRINGS: [u8; 6] = [62, 57, 53, 48, 43, 38];
 
 const SAMPLES_PER_COLUMN: usize = SAMPLE_RATE as usize / 4;
 
