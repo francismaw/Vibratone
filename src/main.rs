@@ -8,8 +8,8 @@ use crate::note::{NoteEvent, SAMPLE_RATE};
 use hound::{SampleFormat, WavIntoSamples, WavSpec, WavWriter};
 
 fn main(){
-    let note = note::pitch_to_freq(69);
-    println!("Frequency of A4 (pitch 69) is: {} Hz", note);
+    //let note = note::pitch_to_freq(69);
+    //println!("Frequency of A4 (pitch 69) is: {} Hz", note);
 
     //let samples = synth::pluck(220.0, SAMPLE_RATE as usize * 2);
 
