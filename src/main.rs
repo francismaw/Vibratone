@@ -60,11 +60,14 @@ G|-----0---0-------|---2-------2-----|
 D|-2-----2---2-2-1-|-0---0-0-----0-1-|";
 
 
-    let notes = tab::parser(tab);
+    let notes = tab::parser(tab, 120.0);
     println!("Notes: {:?}", notes);
     let mono  = synth::render(&notes);
+    let drive = 4.0;
+    let amped = effects::tube_amp(&mono, drive);
+
     let rate = 5.67; // rate of drum spinning rpm / 60 
-    let (left, right) = effects::apply_vibratone(&mono, rate);
+    let (left, right) = effects::apply_vibratone(&amped, rate);
     write_wav(path, &left, &right).expect("Failed to write");
     //write_wav(path, &left, &right).expect("Failed to write");
 }

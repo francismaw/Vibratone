@@ -112,3 +112,16 @@ fn lowpass(samples: &[f32], rate_hz: f32, phase: f32) -> Vec<f32>{
 
 }
 
+pub fn tube_amp (samples: &[f32], drive: f32) -> Vec<f32>{
+    let mut output: Vec<f32> = Vec::with_capacity(samples.len());
+
+    let gain = 1.0 / drive.tanh();
+
+    for &sample in samples{
+        let shape = (sample * drive).tanh() * gain;
+        output.push(shape);
+    }
+    output
+
+}
+
