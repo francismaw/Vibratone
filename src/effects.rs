@@ -125,3 +125,18 @@ pub fn tube_amp (samples: &[f32], drive: f32) -> Vec<f32>{
 
 }
 
+
+pub fn cabinet_sim(samples: &[f32]) -> Vec<f32>{
+    let mut output: Vec<f32> = Vec::with_capacity(samples.len());
+    let mut prev = 0.0;
+    let alpha = 0.25;
+
+    for &sample in samples{
+        let y = prev + alpha * (sample - prev);
+        output.push(y);
+        prev = y;
+    }
+    output
+
+}
+

@@ -31,8 +31,10 @@ pub fn pluck(freq: f32, num_samples: usize) -> Vec<f32> {
         let val = rand::random_range(-1.0 as f32..1.0 as f32);
         y[i] = val;
     }
-    for i in 1..N {
-        y[i] = (y[i] + y[i-1]) * 0.5;
+    for _ in 0..3{
+        for i in 1..N {
+            y[i] = (y[i] + y[i-1]) * 0.5;
+    }
     }
 
     
@@ -60,7 +62,7 @@ pub fn pluck(freq: f32, num_samples: usize) -> Vec<f32> {
     for i in 0..num_samples{
         let curr_val = y[i];
         let delayed_val = if i >= pickup_delay {y[i - pickup_delay]} else {0.0};
-        pickup_out[i] = curr_val - delayed_val;
+        pickup_out[i] = (curr_val + delayed_val) * 0.5;
     }
 
 
