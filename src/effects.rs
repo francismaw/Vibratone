@@ -10,8 +10,11 @@ pub fn apply_vibratone(samples: &[f32], rate_hz: f32)-> (Vec<f32>, Vec<f32>){
 
     let pi = std::f32::consts::PI;
 
-    let mut left = lowpass(&tremolo(&delay_doppler(samples, rate_hz, 0.0), rate_hz, 0.0), rate_hz, 0.0);
-    let mut right  = lowpass(&tremolo(&delay_doppler(samples, rate_hz, pi), rate_hz, pi), rate_hz, pi);
+    //let mut left = lowpass(&tremolo(&delay_doppler(samples, rate_hz, 0.0), rate_hz, 0.0), rate_hz, 0.0);
+    //let mut right  = lowpass(&tremolo(&delay_doppler(samples, rate_hz, pi), rate_hz, pi), rate_hz, pi);
+    let mut left = lowpass(samples, rate_hz, 0.0);
+    let mut right = lowpass(samples, rate_hz, pi);
+
 
     let n = left.len().min(right.len());
     left.truncate(n);

@@ -2,10 +2,11 @@ mod tab;
 mod synth;
 mod note;
 mod effects;
-use std::io::{self, Read};
-use crate::note::{NoteEvent, SAMPLE_RATE};
+mod body;
+use std::io::{self};
+use crate::note::{SAMPLE_RATE};
 
-use hound::{SampleFormat, WavIntoSamples, WavSpec, WavWriter};
+use hound::{SampleFormat, WavSpec, WavWriter};
 
 fn main(){
     //let note = note::pitch_to_freq(69);
@@ -34,23 +35,16 @@ fn main(){
 
 }
 
-fn note_test(path: &str){
-    let notes = vec![NoteEvent{pitch: 60, onset_samples: 0, duration_samples: SAMPLE_RATE as usize * 2},
-    NoteEvent{pitch: 64, onset_samples: SAMPLE_RATE as usize *2, duration_samples: SAMPLE_RATE as usize * 2},
-    NoteEvent{pitch: 67, onset_samples: SAMPLE_RATE as usize *4, duration_samples: SAMPLE_RATE as usize * 2}];
 
-    let rendered = synth::render(&notes);
-    //write_wav(path, &rendered).expect("Failed to write");
-}
 
 fn tab_test(path: &str){
     let tab = "
-e|--12-----------|--------1-----|------15---------|--------------|
-B|--3------------|--------------|------3----------|--5-----6-----|
-G|------------0--|--3-----------|--10--7---9---2--|--3--------9--|
-D|--7------7--8--|--------3-----|-----------------|--------------|
-A|---------------|--------8-----|-----------------|--------------|
-E|--12-----------|--------------|----------12-----|--------------|";
+e|-----------|--1--1-----0--|--------------|--1-----------|
+B|--1--------|--------------|-----1--1-----|--------------|
+G|-----------|--------0-----|--4--2--------|-----2--------|
+D|--2--------|-----3-----3--|--------------|-----2--------|
+A|--3--------|-----2--2-----|-----0--0--3--|--0--------3--|
+E|-----------|--------------|--1-----------|--------0--0--|";
 
 
     let notes = tab::parser(tab, 120.0);
@@ -62,6 +56,8 @@ E|--12-----------|--------------|----------12-----|--------------|";
 
     let rate = 5.67; // rate of drum spinning rpm / 60 
     let (left, right) = effects::apply_vibratone(&cab, rate);
+    //let left = &cab;
+    //let right = &cab;
     write_wav(path, &left, &right).expect("Failed to write");
     //write_wav(path, &left, &right).expect("Failed to write");
 }
