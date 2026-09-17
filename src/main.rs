@@ -3,12 +3,13 @@ mod synth;
 mod note;
 mod effects;
 mod body;
-use std::io::{self};
+mod ui;
+use std::{io::{self}, process::Command};
 use crate::note::{SAMPLE_RATE};
 
 use hound::{SampleFormat, WavSpec, WavWriter};
 
-fn main(){
+fn main() -> anyhow::Result<()>{
     //let note = note::pitch_to_freq(69);
     //println!("Frequency of A4 (pitch 69) is: {} Hz", note);
 
@@ -16,6 +17,22 @@ fn main(){
 
     //println!("Samples at 220 Hz: {:?}", samples);
     // E2; 82.407, A2:  110.0, D3: 146.83, G3: 196.00, B3: 246.94, E4: 329.63
+
+
+    let cli = ui::parse();
+
+    match cli.command {
+        Command::Synth{tab_input, output, tempo} =>{
+
+        }
+        Command::Process{wav_path, output, drive, rotor_speed} =>{
+
+        }
+    }
+
+    Ok(())
+
+    /* 
     println!("Enter input file path: ");
     let mut input = String::new();
     io::stdin()
@@ -30,7 +47,7 @@ fn main(){
         .expect("Failed to read line");
 
 
-    wav_test(input.trim(), output.trim());
+    wav_test(input.trim(), output.trim()); */
 
 }
 
