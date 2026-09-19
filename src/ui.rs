@@ -1,29 +1,29 @@
 use clap::{Parser, Subcommand};
-use std::{path::PathBuf, process::Command};
+use std::{path::PathBuf};
 
 
 #[derive(Parser)]
 #[command(name = "tab-synth")]
-struct Cli {
+pub struct Cli {
     #[command(subcommand)]
-    command: Commands,
+    pub command: Commands,
 }
 
 
 #[derive(Subcommand)]
-enum Commands{
+pub enum Commands{
     /// Synth mode, hear ASCII tabs
     Synth{
-        tab_path: PatBuf,
-        output: Pathbuf,
+        tab_path: PathBuf,
+        output: PathBuf,
 
-        #[arg(long, default_value_t = 120 BPM)]
+        #[arg(long, default_value_t = 120.0)]
         tempo: f32
     },
     /// Modify mode. uplaod guitar audio to have it applied
     Process{
         wav_path: PathBuf,
-        output: Pathbuf, 
+        output: PathBuf, 
 
         #[arg(long, default_value_t = 4.0)]
         drive: f32,

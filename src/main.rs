@@ -6,26 +6,30 @@ mod body;
 mod ui;
 use std::{io::{self}, process::Command};
 use crate::note::{SAMPLE_RATE};
+use clap::Parser;
 
 use hound::{SampleFormat, WavSpec, WavWriter};
 
 fn main() -> anyhow::Result<()>{
-    //let note = note::pitch_to_freq(69);
-    //println!("Frequency of A4 (pitch 69) is: {} Hz", note);
-
-    //let samples = synth::pluck(220.0, SAMPLE_RATE as usize * 2);
-
     //println!("Samples at 220 Hz: {:?}", samples);
     // E2; 82.407, A2:  110.0, D3: 146.83, G3: 196.00, B3: 246.94, E4: 329.63
 
-
-    let cli = ui::parse();
+    let cli = ui::Cli::parse();
 
     match cli.command {
-        Command::Synth{tab_input, output, tempo} =>{
+        ui::Commands::Synth{tab_path, output, tempo} =>{
+            let tab = std::fs::read_to_string(&tab_path)?;
+            let notes = tab::parser(&tab, tempo);
+            let mono = synth::render(&notes);
+            write_wav(output.to_str().unwrap(), &mono, &mono)?;
 
         }
-        Command::Process{wav_path, output, drive, rotor_speed} =>{
+        ui::Commands::Process{wav_path, output, drive, rotor_speed} =>{
+            let mono = read_wav(wav_path.to_str().unwrap(),)?;
+            let amped = effects::tube_amp(&mono, drive);
+            let cab = effects::cabinet_sim(&amped);
+            let (left, right) = effects::apply_vibratone(&cab, rotor_speed);
+            write_wav(output.to_str().unwrap(), &left, &right)?;
 
         }
     }
@@ -101,7 +105,7 @@ fn wav_test(in_path: &str, out_path: &str){
 
 
 
-fn write_wav(path: &str, left: &[f32], right: &[f32]) -> Result<(), hound::Error>{
+fn write_wav(path: &str, left: &[f32], right: &[f32]) -> anyhow::Result<()>{
     let spec = WavSpec{
         channels: 2,
         sample_rate: SAMPLE_RATE,
@@ -119,11 +123,12 @@ fn write_wav(path: &str, left: &[f32], right: &[f32]) -> Result<(), hound::Error
 
     }
 
-    writer.finalize()
+    writer.finalize()?;
+    Ok(())
 }
 
 
-fn read_wav(path: &str) -> Result<Vec<f32>, hound::Error>{
+fn read_wav(path: &str) -> anyhow::Result<Vec<f32>>{
 
     let mut reader = hound::WavReader::open(path)?;
     let spec = reader.spec();
