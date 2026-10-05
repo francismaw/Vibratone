@@ -4,6 +4,7 @@ mod note;
 mod effects;
 mod body;
 mod ui;
+mod tab_test;
 use std::{io::{self}, process::Command};
 use crate::note::{SAMPLE_RATE};
 use clap::Parser;
@@ -13,7 +14,7 @@ use hound::{SampleFormat, WavSpec, WavWriter};
 fn main() -> anyhow::Result<()>{
     //println!("Samples at 220 Hz: {:?}", samples);
     // E2; 82.407, A2:  110.0, D3: 146.83, G3: 196.00, B3: 246.94, E4: 329.63
-
+    /* 
     let cli = ui::Cli::parse();
 
     match cli.command {
@@ -34,7 +35,10 @@ fn main() -> anyhow::Result<()>{
         }
     }
 
+
     Ok(())
+
+    */
 
     /* 
     println!("Enter input file path: ");
@@ -51,7 +55,20 @@ fn main() -> anyhow::Result<()>{
         .expect("Failed to read line");
 
 
-    wav_test(input.trim(), output.trim()); */
+    wav_test(input.trim(), output.trim());  */
+
+    println!("Enter file name: ");
+    let mut input = String::new();
+    io::stdin()
+        .read_line(& mut input)
+        .expect("Failed to read line");
+        println!("Enter file path: ");
+
+
+
+    tab_test(&input.trim()); 
+
+    Ok(())
 
 }
 

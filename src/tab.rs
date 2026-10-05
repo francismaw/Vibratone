@@ -3,7 +3,6 @@ use crate::note::{NoteEvent, SAMPLE_RATE};
 const OPEN_STRINGS: [u8; 6] = [64, 59, 55, 50, 45, 40]; 
 //const OPEN_STRINGS: [u8; 6] = [62, 57, 53, 48, 43, 38];
 
-const SAMPLES_PER_COLUMN: usize = SAMPLE_RATE as usize / 4; // Assuming 4 columns per second (quarter notes at 60 BPM)
 
 
 
@@ -15,6 +14,8 @@ pub fn parser(tab: &str, bpm: f32) -> Vec<NoteEvent>{
     let beat_per_sec = bpm / 60.0;
     let quarter_note_sample = SAMPLE_RATE as f32 / beat_per_sec;
     let eigth_note_sample = (quarter_note_sample / 2.0) as usize;
+
+    //let samples_per_column: usize = eigth_note_sample;
 
     let lines: Vec<&str> = tab.lines().filter(|l| !l.trim().is_empty()).collect();
     let stripped_lines = strip_prefixes(&lines);
@@ -39,14 +40,14 @@ fn parse_block(lines: &[&str], col_offset: usize, step_sample: usize) -> Vec<Not
             let c_next = bytes.get(col + 1).copied().unwrap_or(b' ');
             if c.is_ascii_digit() && c_next.is_ascii_digit(){
                 let pitch = OPEN_STRINGS[string] + (c - b'0') * 10 + (c_next - b'0');
-                let onset_samples = (col + col_offset) * SAMPLES_PER_COLUMN;
+                let onset_samples = (col + col_offset) * step_sample;
                 let duration_samples = step_sample * 4;
                 notes.push(NoteEvent{pitch, onset_samples, duration_samples});
                 col += 1; 
             }
             else if c.is_ascii_digit() {
                 let pitch = OPEN_STRINGS[string] + (c - b'0');
-                let onset_samples = (col + col_offset) * SAMPLES_PER_COLUMN;
+                let onset_samples = (col + col_offset) * step_sample;
                 let  duration_samples = step_sample *4 ;
                 notes.push(NoteEvent{pitch, onset_samples, duration_samples});
             }
